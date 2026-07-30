@@ -5,27 +5,29 @@ on:
     branches:
       - development
 
-jobs:
-  sync-company:
-    runs-on: ubuntu-latest
+permissions:
+  contents: read
 
-    permissions:
-      contents: read
+jobs:
+  sync:
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Team Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Configure Git
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
 
       - name: Push to Company Repository
         env:
           COMPANY_PAT: ${{ secrets.COMPANY_PAT }}
+          COMPANY_REPO: ${{ secrets.COMPANY_REPO }}
         run: |
-          git remote add company https://x-access-token:${COMPANY_PAT}@github.com/mhsaee01234/DevOps-Project-task-6.git
-          git push company development:development
+          git remote add company https://x-access-token:${COMPANY_PAT}@github.com/${COMPANY_REPO}.git
+          git push company HEAD:development --force
